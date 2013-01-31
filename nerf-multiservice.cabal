@@ -1,0 +1,40 @@
+name:               nerf-multiservice
+version:            0.1.0
+synopsis:           Nerf service for the multiservice framework
+description:
+    The library provides a nerf-multiserive executable tool which
+    can be used together with the Polish multiservice framework.
+license:            BSD3
+license-file:       LICENSE
+cabal-version:      >= 1.6
+copyright:          Copyright (c) 2013 IPI PAN
+author:             Jakub Waszczuk
+maintainer:         waszczuk.kuba@gmail.com
+stability:          experimental
+category:           Natural Language Processing
+homepage:           https://github.com/kawu/nerf-multiservice
+build-type:         Simple
+
+executable nerf-multiservice
+    hs-source-dirs: tools, thrift/gen-hs
+    main-is: nerf-multiservice.hs
+    build-depends:
+        base >= 4 && < 5
+      , nerf >= 0.4 && < 0.5
+      , data-named >= 0.5.1 && < 0.6
+      , thrift >= 0.9 && < 0.10
+      , containers
+      , network
+      , optparse-applicative
+      , binary
+      , mtl
+      , text
+      , bytestring
+      , vector
+      , hashable
+      , unordered-containers
+    ghc-options: -Wall -O2 -threaded -rtsopts
+
+source-repository head
+    type: git
+    location: https://github.com/kawu/nerf-multiservice.git
