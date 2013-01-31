@@ -1,5 +1,5 @@
-nerf-multiservice
-=================
+Nerf service for the multiservice framework
+===========================================
 
 The package provides a nerf-multiserive executable tool which
 can be used together with the Polish multiservice framework.
