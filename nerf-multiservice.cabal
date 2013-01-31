@@ -2,7 +2,7 @@ name:               nerf-multiservice
 version:            0.1.0
 synopsis:           Nerf service for the multiservice framework
 description:
-    The library provides a nerf-multiserive executable tool which
+    The package provides a nerf-multiserive executable tool which
     can be used together with the Polish multiservice framework.
 license:            BSD3
 license-file:       LICENSE
