@@ -99,10 +99,10 @@ struct TParagraph {
 
 struct THeader {
     1: string id,
-    2: string title,
-    3: string distributor,
-    4: i64 publicationTime,
-    5: i64 processingDuration,
+    2: string title,		// title of the text (if exists)
+    3: string distributor,	// distributor of the text or name of the annotating tool
+    4: i64 publicationTime,	// date of publication in POSIX format
+    5: i64 processingDuration, 	// time spent on annotation, in milliseconds
     6: string sourceDescText,
     7: string retrievedFrom
 }
