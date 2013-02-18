@@ -7,9 +7,10 @@ import Data.Char (isSpace)
 import System.CPUTime (getCPUTime)
 import qualified Data.Binary as Binary
 import qualified System.IO as IO
-import qualified Data.HashMap.Strict as H
 import qualified Data.Vector as V
 import qualified Data.Text.Lazy as L
+import qualified Data.Text.Lazy.IO as L
+import qualified Data.HashMap.Strict as H
 import qualified Control.Monad.RWS.Strict as RWS
 
 -- Thrift library
@@ -21,6 +22,7 @@ import qualified AnnotatingService as Ann
 import qualified AnnotatingService_Iface as Iface
 
 import qualified Data.Named.Tree as Named
+import qualified Text.Named.Enamex as Enamex
 import qualified NLP.Nerf as Nerf
 import qualified NLP.Nerf.Tokenize as Tok
 
@@ -38,7 +40,7 @@ instance Iface.AnnotatingService_Iface Nerf.Nerf where
                 ps' <- V.fromList <$> mapM (annPar nerf) ps
                 end <- getCPUTime
                 let coef = 10 ^ (9 :: Integer)
-                let diff = end - beg `div` coef
+                let diff = (end - beg) `div` coef
                 return $ ttext
                     { TT.f_TText_paragraphs = Just ps'
                     , TT.f_TText_annotationHeaders = Just $
@@ -76,16 +78,12 @@ annSent :: Nerf.Nerf -> TT.TSentence -> IO TT.TSentence
 annSent nerf tsent = case V.toList <$> TT.f_TSentence_tokens tsent of
     Nothing -> return tsent
     Just ts -> do
-        putStrLn "# Sentence:"
-        putStrLn origSent
-        putStrLn "# Forest:"
-        drawFst neForest
+        putStr "> "
+        L.putStrLn (Enamex.showForest neForest)
         names <- V.fromList <$> identify sentID neForest'
         return $ tsent {TT.f_TSentence_names = Just names}
       where
-        drawFst   = putStrLn . Named.drawForest . Named.mapForest show
-        origSent  = restoreOrigSent ts
-        neForest  = Nerf.ner nerf origSent
+        neForest  = Nerf.ner nerf (restoreOrigSent ts)
         neForest' = Tok.moveNEs neForest ts
         sentID    = maybe "#" id (TT.f_TSentence_id tsent)
 
