@@ -1,5 +1,5 @@
 name:               nerf-multiservice
-version:            0.2.0
+version:            0.2.1
 synopsis:           Nerf service for the multiservice framework
 description:
     The package provides a nerf-multiserive executable tool which

@@ -1,13 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-import Options.Applicative
-import Data.Maybe (mapMaybe)
-import Data.Char (isSpace)
-import System.CPUTime (getCPUTime)
+import           Control.Arrow (second)
+import           Options.Applicative
+import           Data.Maybe (mapMaybe)
+import           Data.Char (isSpace)
+import           System.CPUTime (getCPUTime)
 import qualified Data.Binary as Binary
 import qualified System.IO as IO
 import qualified Data.Vector as V
+import qualified Data.Text as T
 import qualified Data.Text.Lazy as L
 import qualified Data.Text.Lazy.IO as L
 import qualified Data.HashMap.Strict as H
@@ -130,15 +132,16 @@ record ne = do
     RWS.tell [ne]
 
 identifyTree :: Named.NeTree Nerf.NE TT.TToken -> NEM ID
-identifyTree (Named.Node (Left neType) xs) = do
+identifyTree (Named.Node (Left neTypes) xs) = do
     ixs <- mapM identifyTree xs
     ix  <- currID
+    let (neType, neSubType) = second (T.drop 1) (T.breakOn "." neTypes)
     record $ TT.TNamedEntity
                 (Just ix)
                 (Just "")
                 (Just "")
                 (Just $ L.fromStrict neType)
-                (Just "")
+                (Just $ L.fromStrict neSubType)
                 (Just $ V.fromList ixs)
     return ix
 identifyTree (Named.Node (Right tok) _) = case TT.f_TToken_id tok of
