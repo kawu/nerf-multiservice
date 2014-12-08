@@ -86,7 +86,7 @@ annSent nerf tsent = case V.toList <$> TT.f_TSentence_tokens tsent of
         return $ tsent {TT.f_TSentence_names = Just names}
       where
         neForest  = Nerf.ner nerf (restoreOrigSent ts)
-        neForest' = Tok.moveNEs neForest ts
+        neForest' = Tok.sync neForest ts
         sentID    = maybe "#" id (TT.f_TSentence_id tsent)
 
 -- | Restore original sentence.
@@ -162,8 +162,8 @@ data Service = Service
 
 service :: Parser Service
 service = Service
-    <$> argument str (metavar "MODEL")
-    <*> option
+    <$> strArgument (metavar "MODEL")
+    <*> option auto
          ( long "port"
         <> short 'p'
         <> help "Port number"

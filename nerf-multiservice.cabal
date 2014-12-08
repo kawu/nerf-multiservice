@@ -1,5 +1,5 @@
 name:               nerf-multiservice
-version:            0.2.1
+version:            0.2.2
 synopsis:           Nerf service for the multiservice framework
 description:
     The package provides a nerf-multiserive executable tool which
@@ -20,9 +20,9 @@ executable nerf-multiservice
     main-is: nerf-multiservice.hs
     build-depends:
         base >= 4 && < 5
-      , nerf >= 0.4 && < 0.5
+      , nerf >= 0.5 && < 0.6
       , data-named >= 0.5.1 && < 0.6
-      , thrift >= 0.9 && < 0.10
+      , thrift == 0.9.0
       , containers
       , network
       , optparse-applicative
