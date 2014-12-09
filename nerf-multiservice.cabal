@@ -28,6 +28,7 @@ executable nerf-multiservice
       , optparse-applicative
       , binary
       , mtl
+      , transformers
       , text
       , bytestring
       , vector

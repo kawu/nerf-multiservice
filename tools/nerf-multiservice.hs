@@ -14,6 +14,7 @@ import qualified Data.Text.Lazy as L
 import qualified Data.Text.Lazy.IO as L
 import qualified Data.HashMap.Strict as H
 import qualified Control.Monad.RWS.Strict as RWS
+-- import           Control.Monad.Trans.Maybe (runMaybeT)
 
 -- Thrift library
 import Thrift.Server
@@ -131,26 +132,45 @@ record ne = do
     RWS.put (n + 1)
     RWS.tell [ne]
 
-identifyTree :: Named.NeTree Nerf.NE TT.TToken -> NEM ID
+-- | Assign an identifier to a NE as well as compute its orthographic form.
+-- The resulting list of NEs in the portable thrift format will be stored in
+-- the underlying monad.
+identifyTree :: Named.NeTree Nerf.NE TT.TToken -> NEM (ID, L.Text)
 identifyTree (Named.Node (Left neTypes) xs) = do
-    ixs <- mapM identifyTree xs
+    (ixs, orths) <- unzip <$> mapM identifyTree xs
     ix  <- currID
     let (neType, neSubType) = second (T.drop 1) (T.breakOn "." neTypes)
+    let orth = L.concat orths
     record $ TT.TNamedEntity
                 (Just ix)
-                (Just "")
+                (Just $ L.strip orth)
                 (Just "")
                 (Just $ L.fromStrict neType)
                 (Just $ L.fromStrict neSubType)
                 (Just $ V.fromList ixs)
-    return ix
-identifyTree (Named.Node (Right tok) _) = case TT.f_TToken_id tok of
-    Just ix -> return ix
+    return (ix, orth)
+-- identifyTree (Named.Node (Right tok) _) = case TT.f_TToken_id tok of
+--     Just ix -> return ix
+--     -- This should never happen, but...
+--     Nothing -> do
+--         let msg = "ERROR: Token with no ID:\n" ++ show tok
+--         RWS.lift $ IO.hPutStrLn IO.stderr msg
+--         return ""
+identifyTree (Named.Node (Right tok) _) = check $ do
+    ix   <- TT.f_TToken_id tok
+    orth <- TT.f_TToken_orth tok
+    nps  <- TT.f_TToken_noPrecedingSpace tok
+    let orth' = if nps
+            then orth
+            else L.cons ' ' orth
+    return (ix, orth')
+  where
+    check (Just x) = return x
     -- This should never happen, but...
-    Nothing -> do
+    check Nothing = do
         let msg = "ERROR: Token with no ID:\n" ++ show tok
         RWS.lift $ IO.hPutStrLn IO.stderr msg
-        return ""
+        return ("", "")
     
 ----------------------------------
 -- Command-line program definition
